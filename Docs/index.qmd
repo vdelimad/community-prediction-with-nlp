@@ -91,7 +91,7 @@ Our data set, obtained from @volske_tldr_2017, contains nearly 19 GB of data, in
 
 Since the Reddit posts are raw and untouched, we apply a series of cleaning steps to the content of each post. These include removing punctuation and special characters, as well as performing stemming and lemmatization. Having cleaned the textual data comprising each Reddit post, we obtained a vocabulary of over 245,000 unique words used across all posts. Therefore, we kept only the 5,000 most common words as a variable selection technique. In doing so, we can efficiently remove almost 98% of unique words while maintaining nearly 95% of the total words used (see @fig-elbow-method below).
 
-![This figure visualizes the elbow method for reducing vocabulary size. The dashed lines intersect at the threshold for which vocabulary words are kept or removed. Keeping a small portion (5,000) of the most frequent vocabulary words allows for retention of a large portion (95%) of the total words used.](../Output/DataPreparationResults/vocabulary_elbow_method.png){#fig-elbow-method width=60%}
+![This figure visualizes the elbow method for reducing vocabulary size. The dashed lines intersect at the threshold for which vocabulary words are kept or removed. Keeping a small portion (5,000) of the most frequent vocabulary words allows for retention of a large portion (95%) of the total words used.](../output/DataPreparationResults/vocabulary_elbow_method.png){#fig-elbow-method width=60%}
 
 ### Binary Classification
 
@@ -115,9 +115,9 @@ Since these models are more complex, we implemented a training algorithm to perf
 
 ::: {#fig-tree-models-tuning layout-ncol=2}
 
-![Decision Tree Training and Validation Loss](../Output/DecisionTreeResults/decision_tree_cv.png){#fig-decision-tree-cv width=100%}
+![Decision Tree Training and Validation Loss](../output/DecisionTreeResults/decision_tree_cv.png){#fig-decision-tree-cv width=100%}
 
-![Random Forest Training and Validation Loss](../Output/RandomForestResults/random_forest_cv.png){#fig-random-forest-cv width=100%}
+![Random Forest Training and Validation Loss](../output/RandomForestResults/random_forest_cv.png){#fig-random-forest-cv width=100%}
 
 This figure shows the training and validation losses of (a) Decision Tree models and (b) Random Forest models during a 5-fold cross-validation hyperparameter search. As the tree models increase in depth, they begin to overfit to the training data, especially in the case of the Decision Tree.
 :::
@@ -145,9 +145,9 @@ Before diving into multi-class classification, we began with binary classificati
 
 ::: {#fig-logistic layout-ncol=2}
 
-![`AskReddit` vs. `timu`](../Output/LogisticResults/logistic_confusion_matrix_pct_AskReddit_timu.png){#fig-logistic1 width=100%}
+![`AskReddit` vs. `timu`](../output/LogisticResults/logistic_confusion_matrix_pct_AskReddit_timu.png){#fig-logistic1 width=100%}
 
-![`leagueoflegends` vs. `trees`](../Output/LogisticResults/logistic_confusion_matrix_pct_leagueoflegends_trees.png){#fig-logistic2 width=100%}
+![`leagueoflegends` vs. `trees`](../output/LogisticResults/logistic_confusion_matrix_pct_leagueoflegends_trees.png){#fig-logistic2 width=100%}
 
 This figure shows the results of a Logistic Regression model performing binary classification on two pairs of subreddits: (a) `AskReddit` vs. `timu` and (b) `leagueoflegends` vs. `trees`. Each cell in the confusion matrices expresses the model's classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `AskReddit` subreddit, the Logistic Regression model classifies 70.2% of them correctly as belonging to the `AskReddit` subreddit and 29.8% of them incorrectly as belonging to the `timu` subreddit.
 :::
@@ -162,7 +162,7 @@ We train each of our multi-class classification models with optimally-chosen hyp
 
 Our baseline model provides us with a reference point to which we can compare our more complex models in order to evaluate their performance. In @fig-baseline-confusion, we can see a confusion matrix representing the performance of the baseline model on a held-out test set containing 40,000 Reddit posts. It is evident that this model performs poorly at the multi-class classification task, correctly classifying Reddit posts only approximately 20% of the time. The consistency of color across the heat map, rather than a striking diagonal line, is an indication that this model does not classify Reddit posts very well.
 
-![Figure 4: This figure shows the results of a baseline model performing multi-class classification on five subreddits. Each cell in the confusion matrix expresses the model’s classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `timu` subreddit, the baseline model classifies 20.09% of them correctly, 18.98% as belonging to the `leagueoflegends` subreddit, and so on.](../Output/BaselineResults/baseline_confusion_matrix_pct.png){#fig-baseline-confusion width=60%}
+![Figure 4: This figure shows the results of a baseline model performing multi-class classification on five subreddits. Each cell in the confusion matrix expresses the model’s classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `timu` subreddit, the baseline model classifies 20.09% of them correctly, 18.98% as belonging to the `leagueoflegends` subreddit, and so on.](../output/BaselineResults/baseline_confusion_matrix_pct.png){#fig-baseline-confusion width=60%}
 
 #### Tree Models
 
@@ -178,9 +178,9 @@ We implemented our Random Forest model in a similar manner, using 5-Fold CV and 
 
 ::: {#fig-tree-models-results layout-ncol=2}
 
-![Decision Tree Results](../Output/DecisionTreeResults/decision_tree_confusion_matrix_pct.png){#fig-decision-tree width=100%}
+![Decision Tree Results](../output/DecisionTreeResults/decision_tree_confusion_matrix_pct.png){#fig-decision-tree width=100%}
 
-![Random Forest Results](../Output/RandomForestResults/random_forest_confusion_matrix_pct.png){#fig-random-forest width=100%}
+![Random Forest Results](../output/RandomForestResults/random_forest_confusion_matrix_pct.png){#fig-random-forest width=100%}
 
 This figure shows the results of (a) a Decision Tree model and (b) a Random Forest model performing multi-class classification on five subreddits. As the tree models increase in depth, they begin to overfit to the training data, especially in the case of the Decision Tree. Each cell in the confusion matrices expresses the model's classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `leagueoflegends` subreddit, the Decision Tree model classifies 70.31% correctly, 28.88% as belonging to the `AskReddit` subreddit, and so on.
 :::
@@ -190,7 +190,7 @@ The Random Forest, being an ensemble model, also provides us with the most impor
 Overall, our two tree models show significant improvement over our baseline model, with some indications of overfitting to certain subreddits in particular, and also provide us with context about which specific words are considered more heavily in each model.
 
 
-![This figure shows the ten words identified as most important in the Random Forest model, arranged in order of decreasing importance. Words such as 'relationship', 'smoke', and 'game' are most indicative of posts belonging to a specific subreddit.](../Output/RandomForestResults/random_forest_importance.png){#fig-variable-importance width=80%}
+![This figure shows the ten words identified as most important in the Random Forest model, arranged in order of decreasing importance. Words such as 'relationship', 'smoke', and 'game' are most indicative of posts belonging to a specific subreddit.](../output/RandomForestResults/random_forest_importance.png){#fig-variable-importance width=80%}
 
 #### Neural Network
 
@@ -200,7 +200,7 @@ It is evident by both @tbl-experiment-results and @fig-neural-network-confusion 
 
 
 
-![This figure shows the results of a Neural Network model performing multi-class classification on five subreddits. Each cell in the confusion matrix expresses the model's classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `relationships` subreddit, the Neural Network model classifies 90.16% of them correctly, 2.48% as belonging to the `timu` subreddit, and so on.](../Output/NNResults/nn_confusion_matrix_pct.png){#fig-neural-network-confusion width=60%}
+![This figure shows the results of a Neural Network model performing multi-class classification on five subreddits. Each cell in the confusion matrix expresses the model's classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `relationships` subreddit, the Neural Network model classifies 90.16% of them correctly, 2.48% as belonging to the `timu` subreddit, and so on.](../output/NNResults/nn_confusion_matrix_pct.png){#fig-neural-network-confusion width=60%}
 
 Although the Neural Network outperforms the Decision Tree and Random Forest, their vast improvement over the baseline indicates commendable success.
 
