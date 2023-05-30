@@ -1,0 +1,234 @@
+---
+title-block-style: default
+title-block-banner: '#FF4500'
+title-block-banner-color: '#FFFFFF'
+title-block-categories: true
+title: Community Prediction with NLP
+subtitle: Text Classification Algorithms Using Reddit Data
+author-title: AUTHORS
+authors:
+  - name: Victor De Lima (vad49)<br>Matt Moriarty (mdm341)
+institute: Georgetown University<br>M.S. Data Science and Analytics
+date: 2023-05-05
+
+format:
+  html:
+    toc: true
+    number-sections: true
+    embed-resources: true
+    tbl-cap-location: bottom
+    toc-title: Contents
+    code-line-numbers: true
+    code-fold: true
+    code-summary: Show Code
+    bibliography: references.bib
+    grid:
+      sidebar-width: 0px
+      body-width: 1000px
+      margin-width: 200px
+    theme:
+      - journal
+      - custom.scss
+# jupyter: python3
+---
+
+
+::: {.callout-note appearance="simple"}
+All code used in this report is publicly available on [GitHub](https://github.com/vdelimad/community-prediction-with-nlp).
+::: 
+
+
+<!--- ####################################################################### -->
+
+### Abstract {#abstract .unnumbered}
+
+<!--- ####################################################################### -->
+
+In the study, we use Natural Language Processing (NLP) to determine whether we can accurately classify Reddit posts into their respective subreddit by analyzing the language contained in the post's text. We conducted the research by employing Term Frequency methods and supervised learning algorithms. Our findings show that the language individuals use when participating in discussions within a community context provides sufficient information for models to make excellent predictions. We also offer an overview of the details related to model construction and explore the implications of the results.
+
+
+**Keywords**: Natural language processing, community detection, random forests, neural networks
+
+
+
+<!--- ####################################################################### -->
+
+## Introduction {#sec-introduction}
+
+<!--- ####################################################################### -->
+
+
+Natural language is one of the purest and most complex forms of data in the world. Within each of the numerous written languages across the globe are even more intricacies, such as grammatical structures, idioms, and slang terms. These components combine to form a complex yet profoundly intriguing data structure known to us all.
+
+A popular place for such natural language is Reddit. Here, registered users submit content such as links, text posts, images, and videos, which other members then vote up or down. Subreddits are smaller communities within Reddit that house content associated with a specific topic. Since each subreddit's subject is different, analyzing whether users utilize distinctive language when participating in topic-specific discussions is intriguing. Our goal is to develop models that can take an anonymous Reddit post data as input, analyze the natural language comprising that post, and correctly assign it to the subreddit to which it belongs.
+
+Our analysis is motivated by the beneficial applications of Natural Language Processing (NLP) in the real world. For instance, email companies can use NLP to filter out spam emails for their users. Likewise, social networking companies can use NLP to identify commonalities between sub-communities, and marketing companies can use NLP to identify members of a target audience. Our analysis provides a glimpse into the power of NLP tasks and paves the way for more impactful and relevant applications of NLP in the real world.
+
+
+<!--- ####################################################################### -->
+
+## Related Work {#sec-related-work}
+
+<!--- ####################################################################### -->
+
+Text classification problems deal mainly with four aspects: feature extraction, dimensionality reduction, model selection, and evaluation [@kowsari_text_2019]. Feature extraction refers to methods and techniques to turn unstructured text into structured data. A typical procedure begins by preprocessing the text to extract relevant units that discretize the feature space. The process is generally known as tokenization. Then, techniques such as Term Frequency (TF), which creates token counts ("bag-of-words"), can follow from the resulting words. Other popular methods include Word2Vec and Global Vectors for Word Representation (GloVe) which have the added benefit of reducing the dimensionality of the feature space [@vijayarani_text_2016].
+
+However, even with such techniques, navigating the feature space can become computationally challenging due to the potentially vast number of words in a corpus. Principal component analysis (PCA) and linear discriminant analysis (LDA) are common techniques for selecting the best features [@singh_novel_2022]. When choosing an optimal classifier, there is empirical support for logistic regression as an effective method for binary text classification tasks [@shah_comparative_2020]. For multi-class classification, tree-based classifiers such as Decision Trees and Random Forests are very successful in text-based tasks [@xu_improved_2012]. More recently, deep learning algorithms have become popular due to their ability to navigate complex data and model nonlinear relationships [@lecun_deep_2015]. For model evaluation, accuracy is a simple yet effective metric as long as there is a balance in the number of observations among the classes. Otherwise, other metrics may be preferable, such as the area on the curve of a ROC (Receiver Operating Characteristics) curve [@huang_using_2005].
+
+We build on this body of research to implement our community prediction model, detailed in @sec-methodologies.
+
+
+
+<!--- ####################################################################### -->
+
+## Methodologies {#sec-methodologies}
+
+<!--- ####################################################################### -->
+
+### About the Data
+
+Our data set, obtained from @volske_tldr_2017, contains nearly 19 GB of data, involving almost four million Reddit posts. Alongside each post is a collection of information, such as the author of the post and the subreddit to which the post belongs. As a data reduction technique, we randomly sampled 40,000 posts from each of the five most popular subreddits `AskReddit`, `leagueoflegends`, `relationships`, `timu`^[The name of this subreddit was adapted from the original `tifu`.], and `trees`. This resulted in a total of 200,000 posts, providing us with a data set of size 300 MB.
+
+Since the Reddit posts are raw and untouched, we apply a series of cleaning steps to the content of each post. These include removing punctuation and special characters, as well as performing stemming and lemmatization. Having cleaned the textual data comprising each Reddit post, we obtained a vocabulary of over 245,000 unique words used across all posts. Therefore, we kept only the 5,000 most common words as a variable selection technique. In doing so, we can efficiently remove almost 98% of unique words while maintaining nearly 95% of the total words used (see @fig-elbow-method below).
+
+![This figure visualizes the elbow method for reducing vocabulary size. The dashed lines intersect at the threshold for which vocabulary words are kept or removed. Keeping a small portion (5,000) of the most frequent vocabulary words allows for retention of a large portion (95%) of the total words used.](../Output/DataPreparationResults/vocabulary_elbow_method.png){#fig-elbow-method width=60%}
+
+### Binary Classification
+
+First, we explore binary classification. The logistic regression model estimates the probability that the dependent variable Y belongs to a particular category rather than modeling the direct response as in linear regression. The model uses the maximum likelihood method for model fitting, which estimates the beta coefficients that maximize the likelihood function [@james_introduction_2013]. We use the SKLearn implementation of logistic regression [@pedregosa_scikit-learn_2012], in which we predict the probability $\hat{p}(X_i) = \frac{1}{1 + \exp(-X_i w - w_0)}$. We include a Lasso penalty term yielding the following loss function:
+$$
+\min_{w} C \sum_{i=1}^n \left(-y_i \log(\hat{p}(X_i)) - (1 - y_i) \log(1 - \hat{p}(X_i))\right) + \|w\|_1
+$$
+
+
+### Multi-Class Classification
+
+#### Baseline Model
+
+Our first multi-class classification method acts as a baseline to compare our other models. This model simply takes a random guess as to which subreddit a post belongs. As such, we can expect this model to be around 20% accurate, correctly classifying approximately one out of five posts. Note that this model does not implement a training algorithm because of its simplicity - it merely makes a random classification for each post in the testing set.
+
+#### Tree Models
+
+Our next pair of models consists of a Decision Tree and a Random Forest. A Decision Tree is quite like how it sounds - it is a tree that makes decisions in order to categorize data. Starting from its "root," the Decision Tree splits data based on certain conditions to create the purest splits possible. A Random Forest is an ensemble of simple trees known as weak learners. When constructing the Random Forest, each tree only considers a subset of the variables. This procedure decorrelates the trees, making the resulting trees' average less variable and more reliable.
+
+Since these models are more complex, we implemented a training algorithm to perform hyperparameter tuning. Splitting the data into training, validation, and testing sets, we used 5-fold cross-validation across a hyperparameter grid search to determine the optimal hyperparameters for each model. Using categorical cross-entropy loss as the key performance metric, we optimized our hyperparameter selection by identifying the configuration such that the validation loss is minimal with little to no overfitting [@james_introduction_2013]. We provide an example of this hyperparameter selection process used across all the models in @fig-tree-models-tuning.
+
+::: {#fig-tree-models-tuning layout-ncol=2}
+
+![Decision Tree Training and Validation Loss](../Output/DecisionTreeResults/decision_tree_cv.png){#fig-decision-tree-cv width=100%}
+
+![Random Forest Training and Validation Loss](../Output/RandomForestResults/random_forest_cv.png){#fig-random-forest-cv width=100%}
+
+This figure shows the training and validation losses of (a) Decision Tree models and (b) Random Forest models during a 5-fold cross-validation hyperparameter search. As the tree models increase in depth, they begin to overfit to the training data, especially in the case of the Decision Tree.
+:::
+
+
+#### Neural Network
+
+In a basic Neural Network, the model feeds a vector of variables, referred to as the "input layer," to a second layer that performs non-linear transformations of the data. This process may be repeated for additional layers until reaching the last output layer, providing the predicted values. The procedure optimizes iteratively using gradient descent and backpropagation algorithms [@james_introduction_2013].
+
+Since this model is very complex, we again implement a training algorithm in order to perform hyperparameter tuning. We implement a deep feed-forward Neural Network using `PyTorch` and use a grid search to identify the optimal hyperparameters for the model. As with our tree models, we use a validation set and 5-fold cross validation, along with categorical cross-entropy loss, to select these hyperparameters. 
+
+
+
+
+<!--- ####################################################################### -->
+
+## Experiments and Results {#sec-experiments-and-results}
+
+<!--- ####################################################################### -->
+
+
+### Binary Classification
+
+Before diving into multi-class classification, we began with binary classification. We ran the logistic regression model using a regularization lambda of 0.001 and five-fold Cross-Validation (CV) on the `AskReddit` vs `timu` and `leagueoflegends` vs `trees` categories. @fig-logistic shows the model results. From this model, we can see that the classification performance of posts belonging to `AskReddit` is lower (70.2%) than `timu` (84.2%) or `leagueoflegends` (97.4%). We expect these results since `AskReddit` is a more general category, while `leagueoflegends` is more niche, and the community might have a more topic-specific vocabulary that gets picked up by the model. 
+
+::: {#fig-logistic layout-ncol=2}
+
+![`AskReddit` vs. `timu`](../Output/LogisticResults/logistic_confusion_matrix_pct_AskReddit_timu.png){#fig-logistic1 width=100%}
+
+![`leagueoflegends` vs. `trees`](../Output/LogisticResults/logistic_confusion_matrix_pct_leagueoflegends_trees.png){#fig-logistic2 width=100%}
+
+This figure shows the results of a Logistic Regression model performing binary classification on two pairs of subreddits: (a) `AskReddit` vs. `timu` and (b) `leagueoflegends` vs. `trees`. Each cell in the confusion matrices expresses the model's classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `AskReddit` subreddit, the Logistic Regression model classifies 70.2% of them correctly as belonging to the `AskReddit` subreddit and 29.8% of them incorrectly as belonging to the `timu` subreddit.
+:::
+
+Although this is a relatively good performance, many real-world scenarios are not binary, for which more complex models are necessary.
+
+### Multi-Class Classification
+
+We train each of our multi-class classification models with optimally-chosen hyperparameters on a large training set. We then assess the implementation by evaluating performance metrics on a held-out test set. We calculate the overall model accuracy on the classification task, weighted precision and recall measures, and the area under the Receiver Operating Characteristic (ROC) curve. The following sections detail the implementation of each model.
+
+#### Baseline Model
+
+Our baseline model provides us with a reference point to which we can compare our more complex models in order to evaluate their performance. In @fig-baseline-confusion, we can see a confusion matrix representing the performance of the baseline model on a held-out test set containing 40,000 Reddit posts. It is evident that this model performs poorly at the multi-class classification task, correctly classifying Reddit posts only approximately 20% of the time. The consistency of color across the heat map, rather than a striking diagonal line, is an indication that this model does not classify Reddit posts very well.
+
+![Figure 4: This figure shows the results of a baseline model performing multi-class classification on five subreddits. Each cell in the confusion matrix expresses the model’s classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `timu` subreddit, the baseline model classifies 20.09% of them correctly, 18.98% as belonging to the `leagueoflegends` subreddit, and so on.](../Output/BaselineResults/baseline_confusion_matrix_pct.png){#fig-baseline-confusion width=60%}
+
+#### Tree Models
+
+
+
+
+Our tree models, providing a level of complexity not present in our baseline model, express good performance on the held-out test set.
+
+We implemented our Decision Tree using 5-Fold CV and a maximum tree depth of 8. We find that the model achieves over 60% accuracy when classifying Reddit posts in the test set. However, indicated by the presence of color in the first column, this model appears to be classifying a lot of Reddit posts in the test set as belonging to the `AskReddit` subreddit. As a result, the impressive-looking 79.35% classification accuracy on posts belonging to this subreddit is diminished by the fact that this model is very frequently attempting to classify posts as such. Results are shown in @fig-decision-tree,
+
+We implemented our Random Forest model in a similar manner, using 5-Fold CV and a maximum tree depth of 10. We find that the model achieves over 70% classification accuracy when classifying Reddit posts in the test set. This model expresses a weaker tendency to commonly classify posts as belonging to the `AskReddit` subreddit, like the Decision Tree does. These results are indicative of a stronger model fit. Results are shown in @fig-random-forest.
+
+
+::: {#fig-tree-models-results layout-ncol=2}
+
+![Decision Tree Results](../Output/DecisionTreeResults/decision_tree_confusion_matrix_pct.png){#fig-decision-tree width=100%}
+
+![Random Forest Results](../Output/RandomForestResults/random_forest_confusion_matrix_pct.png){#fig-random-forest width=100%}
+
+This figure shows the results of (a) a Decision Tree model and (b) a Random Forest model performing multi-class classification on five subreddits. As the tree models increase in depth, they begin to overfit to the training data, especially in the case of the Decision Tree. Each cell in the confusion matrices expresses the model's classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `leagueoflegends` subreddit, the Decision Tree model classifies 70.31% correctly, 28.88% as belonging to the `AskReddit` subreddit, and so on.
+:::
+
+The Random Forest, being an ensemble model, also provides us with the most important features of a post across the weak learners in the ensemble, which can be seen in @fig-variable-importance. Here, we find that words like ‘relationship’, ‘smoke’, and ‘game’ are important to the model as it aims to classify a post as belonging to a particular subreddit. Understanding the focus of each of the five subreddits in our analysis, we can interpret these words as the strongest indicators that a post belongs to the `relationships`, `trees`, or `leagueoflegends` subreddit, respectively.
+
+Overall, our two tree models show significant improvement over our baseline model, with some indications of overfitting to certain subreddits in particular, and also provide us with context about which specific words are considered more heavily in each model.
+
+
+![This figure shows the ten words identified as most important in the Random Forest model, arranged in order of decreasing importance. Words such as 'relationship', 'smoke', and 'game' are most indicative of posts belonging to a specific subreddit.](../Output/RandomForestResults/random_forest_importance.png){#fig-variable-importance width=80%}
+
+#### Neural Network
+
+We implemented our Neural Network using a multi-layer perceptron with two hidden layers. The first layer has 128 neurons, and the second layer has 64. The model utilizes the ReLU activation function and the Adam optimizer. We regularized the model using dropout with a rate of 0.5 and Lasso with a regularization strength of 0.0001. 
+
+It is evident by both @tbl-experiment-results and @fig-neural-network-confusion that the Neural Network model outperforms all other models across all metrics. Achieving a classification accuracy of almost 85%, this model proves that it can effectively analyze natural language within a Reddit post to assign it to the correct subreddit. This performance is consistent in both the training and testing sets due to regularization. In @fig-neural-network-confusion specifically, this effectiveness is highlighted by the sharp diagonal line in the confusion matrix, indicating strong classification accuracy, precision, and recall measures for the model. 
+
+
+
+![This figure shows the results of a Neural Network model performing multi-class classification on five subreddits. Each cell in the confusion matrix expresses the model's classifications as a proportion of classifications in that row. For instance, of all Reddit posts belonging to the `relationships` subreddit, the Neural Network model classifies 90.16% of them correctly, 2.48% as belonging to the `timu` subreddit, and so on.](../Output/NNResults/nn_confusion_matrix_pct.png){#fig-neural-network-confusion width=60%}
+
+Although the Neural Network outperforms the Decision Tree and Random Forest, their vast improvement over the baseline indicates commendable success.
+
+
+
+|Model Type   | Accuracy  | Weighted Precision  | Weighted Recall  | ROC AUC |
+| :---:    | :---:  | :---:     | :---:    | :---:   |
+|Random Classifier | 0.1981  | 0.1981     | 0.1981    | 0.4987  | 
+|Decision Tree   | 0.6378  | 0.7334     | 0.6378    | 0.8533  | 
+|Random Forest   | 0.7644  | 0.7697     | 0.7644    | 0.9333  | 
+|Neural Network  | **0.8457**  | **0.8465**     | **0.8435**    | **0.9712**  |
+
+: This table shows performance metrics across all models, indicating that the Neural Network is the top performer, followed by the Random Forest. The performance metrics include Accuracy, Weighted Precision, Weighted Recall, and ROC AUC. {#tbl-experiment-results}
+
+
+<!--- ####################################################################### -->
+
+## Conclusions {#sec-conclusions}
+
+<!--- ####################################################################### -->
+
+This study shows that the text-based language people use in discussions as part of a community contains enough information to predict the association effectively. Using Term Frequency methods and supervised learning algorithms, our model utilizes information on both words used and their usage frequency. We find the best-performing model to be the feed-forward Neural Network described in @sec-experiments-and-results, followed by the Random Forest, both significantly outperforming the random classifier. This research may prove valuable for companies that identify and appeal to individuals sharing common interests, such as a marketing or social media company seeking to target relevant ads to a specific demographic.
+
+Future research may involve Recurrent Neural Networks, which have also been shown effective for text-based classification. Additionally, bi-grams rather than single words may be considered as tokens to remove some of the ambiguity that may be present (for example, the term 'relationship' may be more informative with accompanying words rather than on its own). Lastly, unsupervised learning would also provide intriguing extensions to the model to show whether clusters exist that may not directly correspond to particular subreddits.
+
+
+<!--- ####################################################################### -->
+
+## References {#references .unnumbered}
+
+<!--- ####################################################################### -->
