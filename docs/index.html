@@ -3224,9 +3224,11 @@ return!"\t\n\x0B\f\r                　\u2028\u2029
 </section>
 <section id="binary-classification" class="level3" data-number="3.2">
 <h3 data-number="3.2" class="anchored" data-anchor-id="binary-classification"><span class="header-section-number">3.2</span> Binary Classification</h3>
-<p>First, we explore binary classification. The logistic regression model estimates the probability that the dependent variable Y belongs to a particular category rather than modeling the direct response as in linear regression. The model uses the maximum likelihood method for model fitting, which estimates the beta coefficients that maximize the likelihood function <span class="citation" data-cites="james_introduction_2013">(<a href="#ref-james_introduction_2013" role="doc-biblioref">James et al. 2013</a>)</span>. We use the SKLearn implementation of logistic regression <span class="citation" data-cites="pedregosa_scikit-learn_2012">(<a href="#ref-pedregosa_scikit-learn_2012" role="doc-biblioref">Pedregosa et al. 2012</a>)</span>, in which we predict the probability <span class="math inline">\(\hat{p}(X_i) = \frac{1}{1 + \exp(-X_i w - w_0)}\)</span>. We include a Lasso penalty term yielding the following loss function: <span class="math display">\[
-\min_{w} C \sum_{i=1}^n \left(-y_i \log(\hat{p}(X_i)) - (1 - y_i) \log(1 - \hat{p}(X_i))\right) + \|w\|_1
-\]</span></p>
+<p>First, we explore binary classification. The logistic regression model estimates the probability that the dependent variable Y belongs to a particular category rather than modeling the direct response as in linear regression. The model uses the maximum likelihood method for model fitting, which estimates the beta coefficients that maximize the likelihood function <span class="citation" data-cites="james_introduction_2013">(<a href="#ref-james_introduction_2013" role="doc-biblioref">James et al. 2013</a>)</span>. We use the SKLearn implementation of logistic regression <span class="citation" data-cites="pedregosa_scikit-learn_2012">(<a href="#ref-pedregosa_scikit-learn_2012" role="doc-biblioref">Pedregosa et al. 2012</a>)</span>, in which we predict the probability <span class="math inline">\(\hat{p}(X_i) = \frac{1}{1 + \exp(-X_i w - w_0)}\)</span>. We include a Lasso penalty term yielding the following loss function:</p>
+<p><span id="eq-q-update"><span class="math display">\[
+\begin{align}\begin{aligned} \min_{w} C \sum_{i=1}^n  (-y_i \log(\hat{p}(X_i)) \\\begin{split}  - (1 - y_i) \log(1 - \hat{p}(X_i)))   + \|w\|_1
+\end{split}\end{aligned}\end{align}
+\tag{1}\]</span></span></p>
 </section>
 <section id="multi-class-classification" class="level3" data-number="3.3">
 <h3 data-number="3.3" class="anchored" data-anchor-id="multi-class-classification"><span class="header-section-number">3.3</span> Multi-Class Classification</h3>
