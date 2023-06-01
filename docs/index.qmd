@@ -99,7 +99,7 @@ First, we explore binary classification. The logistic regression model estimates
 
 
 $$ 
-\begin{align}\begin{aligned} \min_{w} C \sum_{i=1}^n  (-y_i \log(\hat{p}(X_i)) \\\begin{split}  - (1 - y_i) \log(1 - \hat{p}(X_i)))   + \|w\|_1
+\begin{align}\begin{aligned} \min_{w} C \sum_{i=1}^n  (-y_i \log(\hat{p}(X_i)) \\\begin{split}  - (1 - y_i) \log(1 - \hat{p}(X_i))) \end{split} \\\begin{split} + \|w\|_1
 \end{split}\end{aligned}\end{align} 
 $$ {#eq-q-update}
 
