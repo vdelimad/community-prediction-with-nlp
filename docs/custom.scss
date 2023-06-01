@@ -28,14 +28,12 @@ h3 {
 /* Default table styles */
 table {
     width: 100%;
-    /* Other table styles... */
   }
   
   /* Styles for mobile devices */
   @media (max-width: 767px) {
     table {
       width: 100%;
-      font-size: 0.5rem;
-      /* Additional table styles for mobile... */
+      font-size: 0.6rem;
     }
   }
