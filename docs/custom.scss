@@ -23,3 +23,18 @@ h3 {
     color: #1B2426;
 }
 */
+
+
+/* Default table styles */
+table {
+    width: 100%;
+    /* Other table styles... */
+  }
+  
+  /* Styles for mobile devices */
+  @media (max-width: 767px) {
+    table {
+      width: 100%;
+      /* Additional table styles for mobile... */
+    }
+  }
