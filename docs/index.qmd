@@ -208,6 +208,7 @@ It is evident by both @tbl-experiment-results and @fig-neural-network-confusion 
 Although the Neural Network outperforms the Decision Tree and Random Forest, their vast improvement over the baseline indicates commendable success.
 
 
+::: {width='100%'}
 
 |Model Type   | Accuracy  | Weighted Precision  | Weighted Recall  | ROC AUC |
 | :---:    | :---:  | :---:     | :---:    | :---:   |
@@ -216,7 +217,11 @@ Although the Neural Network outperforms the Decision Tree and Random Forest, the
 |Random Forest   | 0.7644  | 0.7697     | 0.7644    | 0.9333  | 
 |Neural Network  | **0.8457**  | **0.8465**     | **0.8435**    | **0.9712**  |
 
-: This table shows performance metrics across all models, indicating that the Neural Network is the top performer, followed by the Random Forest. The performance metrics include Accuracy, Weighted Precision, Weighted Recall, and ROC AUC. {#tbl-experiment-results}
+: These tables show performance metrics across all models, indicating that the Neural Network is the top performer, followed by the Random Forest. The performance metrics include Accuracy, Weighted Precision, Weighted Recall, and ROC AUC. {#tbl-experiment-results}
+
+:::
+
+
 
 
 <!--- ####################################################################### -->
