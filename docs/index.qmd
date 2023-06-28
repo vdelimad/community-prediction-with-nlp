@@ -23,10 +23,10 @@ format:
     code-fold: true
     code-summary: Show Code
     bibliography: references.bib
-    grid:
-      sidebar-width: 0px
-      body-width: 1000px
-      margin-width: 200px
+    #grid:
+    #  sidebar-width: 0px
+    #  body-width: 1000px
+    #  margin-width: 200px
     theme:
       - journal
       - custom.scss
