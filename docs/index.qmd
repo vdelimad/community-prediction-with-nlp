@@ -10,7 +10,7 @@ authors:
   - name: Victor De Lima (vad49)<br>Matt Moriarty (mdm341)
 institute: Georgetown University<br>M.S. Data Science and Analytics
 date: 2023-05-05
-
+page-layout: article
 format:
   html:
     toc: true
